@@ -2,12 +2,15 @@ import psycopg2
 import os
 from dotenv import load_dotenv
 
+# Force postgres connection error messages to be in English to avoid UnicodeDecodeError
+os.environ['LC_ALL'] = 'C'
+
 load_dotenv('.env')
 
 DB_NAME = os.getenv('DB_NAME', 'bank_db')
 DB_USER = os.getenv('DB_USER', 'postgres')
-DB_PASSWORD = os.getenv('DB_PASSWORD', 'postgres')
-DB_HOST = os.getenv('DB_HOST', 'localhost')
+DB_PASSWORD = os.getenv('DB_PASSWORD', '0982')
+DB_HOST = os.getenv('DB_HOST', '127.0.0.1')
 DB_PORT = os.getenv('DB_PORT', '5432')
 
 try:
@@ -22,6 +25,8 @@ except psycopg2.OperationalError as e:
         pass
     print("Error general catchado")
 except Exception as e:
+    import traceback
+    traceback.print_exc()
     try:
         # e.args[0] is the error message string which contains the badly decoded characters
         error_msg = str(e)
