@@ -1,0 +1,28 @@
+=== CÓMO EJECUTAR BLUESKY (Bank Antifraud) ===
+
+Para iniciar el sistema de manera local, debes levantar dos servidores (el Backend de Django y el Frontend de React). Sigue estos pasos abriendo dos terminales separadas en la carpeta de tu proyecto (Bank_Antifraud):
+
+--- TERMINAL 1: Servidor Backend (Django) ---
+1. Asegúrate de tener tu entorno virtual activado si utilizas uno.
+2. Posiciónate en la carpeta raíz del proyecto.
+3. Ejecuta el servidor:
+   python manage.py runserver
+
+El backend quedará corriendo en http://localhost:8000
+
+
+--- TERMINAL 2: Servidor Frontend (Vite/React) ---
+1. Posiciónate en la carpeta del frontend:
+   cd frontend
+2. Instala las dependencias (si no lo has hecho antes):
+   npm install
+3. Inicia el entorno de desarrollo:
+   npm run dev
+
+El frontend quedará corriendo en http://localhost:5173
+
+---------------------------------------------------
+Datos de prueba por defecto:
+- Usuario: klown3d
+- Contraseña: 0982
+- Destinatario de prueba: 200000000002 (tienda_destino)

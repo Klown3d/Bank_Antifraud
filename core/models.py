@@ -15,6 +15,9 @@ class User(AbstractUser):
     fecha_nacimiento = models.DateField(blank=True, null=True)
     direccion = models.CharField(max_length=255, blank=True, null=True)
     estado = models.CharField(max_length=15, choices=ESTADOS, default='ACTIVO')
+    
+    is_email_verified = models.BooleanField(default=False)
+    verification_token = models.UUIDField(default=uuid.uuid4, null=True, blank=True)
 
     def __str__(self):
         return f"{self.username} - {self.dni}"
@@ -46,6 +49,43 @@ class Cuenta(models.Model):
 
     def __str__(self):
         return f"Cuenta {self.numero_cuenta} - {self.usuario.username} (${self.saldo})"
+        
+    def get_nivel_confidencialidad(self):
+        # Retorna el porcentaje de confianza de esta cuenta basado en su historial antifraude
+        # related_name de AlertaFraude es 'alertas'
+        score = 100
+        for alerta in self.alertas.all():
+            if alerta.nivel_riesgo == 'CRITICO':
+                score -= 50
+            elif alerta.nivel_riesgo == 'ALTO':
+                score -= 20
+            elif alerta.nivel_riesgo == 'MEDIO':
+                score -= 5
+        return max(0, score)
+
+class Reserva(models.Model):
+    cuenta = models.ForeignKey(Cuenta, on_delete=models.CASCADE, related_name='reservas')
+    nombre = models.CharField(max_length=100)
+    objetivo_monto = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    saldo_acumulado = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Reserva {self.nombre} - ${self.saldo_acumulado}"
+
+class Inversion(models.Model):
+    TIPOS_INVERSION = (
+        ('FCI', 'Fondo Común de Inversión'),
+        ('PLAZO_FIJO', 'Plazo Fijo'),
+    )
+    cuenta = models.ForeignKey(Cuenta, on_delete=models.CASCADE, related_name='inversiones')
+    tipo = models.CharField(max_length=20, choices=TIPOS_INVERSION, default='FCI')
+    monto_invertido = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    rendimiento_diario_estimado = models.DecimalField(max_digits=5, decimal_places=2, default=0.05) # 5%
+    fecha_inversion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Inversión {self.tipo} - ${self.monto_invertido}"
 
 class Transaccion(models.Model):
     ESTADOS_TRANSACCION = (
