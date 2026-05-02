@@ -19,10 +19,19 @@ const Register: React.FC = () => {
     setMensaje(null);
     try {
       await axios.post('http://localhost:8000/api/core/register/', formData);
-      setMensaje({ text: 'Cuenta creada. Revisa tu consola/email para el link de verificación.', type: 'success' });
+      setMensaje({ text: 'Cuenta creada exitosamente. Revisa tu bandeja de entrada de Gmail para verificar tu correo.', type: 'success' });
       setTimeout(() => navigate('/login'), 4000);
     } catch (err: any) {
-      setMensaje({ text: 'Error en el registro. Verifique sus datos.', type: 'error' });
+      const data = err.response?.data;
+      let errorMsg = 'Error en el registro. Verifique sus datos.';
+      if (data) {
+        // Django REST returns field-specific errors as { field: [messages] }
+        const details = Object.entries(data).map(([key, val]: [string, any]) => 
+          `${key}: ${Array.isArray(val) ? val.join(', ') : val}`
+        ).join(' | ');
+        if (details) errorMsg = details;
+      }
+      setMensaje({ text: errorMsg, type: 'error' });
     }
   };
 

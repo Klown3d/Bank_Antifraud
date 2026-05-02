@@ -269,6 +269,7 @@ class VerifyEmailView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request, token):
+        print(f"DEBUG: Received token {token}")
         try:
             user = User.objects.get(verification_token=token)
             user.is_email_verified = True
@@ -312,11 +313,15 @@ class ResendVerificationView(views.APIView):
         if user.is_email_verified:
             return Response({"error": "Su correo ya está verificado."}, status=status.HTTP_400_BAD_REQUEST)
         
+        print(f"DEBUG: Resending for user {user.username} ({user.email})")
         import uuid
         user.verification_token = uuid.uuid4()
+        print(f"DEBUG: New token generated: {user.verification_token}")
         user.save()
+        print("DEBUG: User saved successfully")
         
         verify_url = f"http://localhost:5173/verify-email/{user.verification_token}"
+        print(f"DEBUG: Verify URL: {verify_url}")
         try:
             send_mail(
                 'Reenvío: Verifica tu correo en BlueSky',
@@ -327,4 +332,4 @@ class ResendVerificationView(views.APIView):
             )
             return Response({"mensaje": "Correo reenviado."})
         except Exception as e:
-            return Response({"error": "Error al enviar correo."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": f"Error al enviar correo: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

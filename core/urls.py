@@ -14,7 +14,7 @@ urlpatterns = [
     path('transferir/', RealizarTransferenciaView.as_view(), name='realizar-transferencia'),
     path('contactos/', ContactosView.as_view(), name='contactos'),
     path('register/', RegisterView.as_view(), name='register'),
-    path('verify-email/<str:token>/', VerifyEmailView.as_view(), name='verify-email'),
+    path('verify-email/<uuid:token>/', VerifyEmailView.as_view(), name='verify-email'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('resend-verification/', ResendVerificationView.as_view(), name='resend-verification'),
 ]
